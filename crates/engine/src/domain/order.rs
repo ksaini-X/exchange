@@ -29,6 +29,7 @@ pub struct Order {
     time_in_force: TimeInForce,
 }
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum OrderError {
     InvalidPrice(PriceError),
     InvalidQuantity(QuantityError),
@@ -55,12 +56,12 @@ impl Order {
         quantity: Decimal,
         time_in_force: TimeInForce,
     ) -> Result<Self, OrderError> {
-        let price_ticks = PriceTicks::from_price(price, instrument.tick_size)?;
-        let quantity_lots = QuantityLots::from_quantity(quantity, instrument.lot_size)?;
+        let price_ticks = PriceTicks::from_price(price, instrument.tick_size())?;
+        let quantity_lots = QuantityLots::from_quantity(quantity, instrument.lot_size())?;
         let order_id = OrderId::new();
 
         Ok(Self {
-            instrument_id: instrument.instrument_id,
+            instrument_id: instrument.id(),
             account_id,
             order_id,
             side,
