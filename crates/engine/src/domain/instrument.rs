@@ -4,12 +4,12 @@ use crate::domain::{asset::Asset, ids::InstrumentId};
 
 #[derive(PartialEq, Debug)]
 pub struct Instrument {
-    instrument_id: InstrumentId,
-    symbol: String,
-    base_asset: Asset,
-    quote_asset: Asset,
-    tick_size: Decimal,
-    lot_size: Decimal,
+    pub instrument_id: InstrumentId,
+    pub symbol: String,
+    pub base_asset: Asset,
+    pub quote_asset: Asset,
+    pub tick_size: Decimal,
+    pub lot_size: Decimal,
 }
 
 impl Instrument {

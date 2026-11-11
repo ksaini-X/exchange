@@ -1,8 +1,8 @@
-use std::ops::Div;
+use std::{error::Error, ops::Div};
 
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
 pub struct PriceTicks(u64);
 
 impl PriceTicks {
