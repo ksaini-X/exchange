@@ -1,11 +1,10 @@
 use rust_decimal::Decimal;
-use uuid::Uuid;
 
-use crate::domain::asset::Asset;
+use crate::domain::{asset::Asset, ids::InstrumentId};
 
 #[derive(PartialEq, Debug)]
 pub struct Instrument {
-    instrument_id: Uuid,
+    instrument_id: InstrumentId,
     symbol: String,
     base_asset: Asset,
     quote_asset: Asset,
@@ -31,7 +30,7 @@ impl Instrument {
         if lot_size <= Decimal::ZERO {
             return Err(InstrumentError::InvalidLotSize);
         }
-        let instrument_id = Uuid::new_v4();
+        let instrument_id = InstrumentId::new();
         let symbol = base_asset.to_string() + &"/" + &quote_asset.to_string();
         Ok(Self {
             instrument_id,
