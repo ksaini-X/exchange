@@ -85,6 +85,19 @@ mod instrument_test {
     }
 
     #[test]
+    fn test_instrument_creation_with_negative_lot_size() {
+        let instrument = Instrument::new(Asset::Btc, Asset::Sol, dec!(0.01), dec!(-0.01));
+        assert!(instrument.is_err());
+        assert_eq!(instrument, Err(InstrumentError::InvalidLotSize));
+    }
+    #[test]
+    fn test_instrument_creation_with_negative_tick_size() {
+        let instrument = Instrument::new(Asset::Btc, Asset::Sol, dec!(-0.01), dec!(0.001));
+        assert!(instrument.is_err());
+        assert_eq!(instrument, Err(InstrumentError::InvalidTickSize));
+    }
+
+    #[test]
     fn test_instrument_creation_with_invalid_lot_size() {
         let instrument = Instrument::new(Asset::Btc, Asset::Sol, dec!(0.01), dec!(0));
         assert!(instrument.is_err());
