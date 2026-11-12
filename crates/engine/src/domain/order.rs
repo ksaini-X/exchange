@@ -1,8 +1,8 @@
 use crate::domain::{
     ids::{AccountId, InstrumentId, OrderId},
     instrument::Instrument,
-    lot::{QuantityError, QuantityLots},
     price::{PriceError, PriceTicks},
+    quantity::{QuantityError, QuantityLots},
 };
 use rust_decimal::Decimal;
 
@@ -69,6 +69,9 @@ impl Order {
             price: price_ticks,
             time_in_force,
         })
+    }
+    pub fn quantity(&self) -> QuantityLots {
+        self.quantity
     }
 }
 
