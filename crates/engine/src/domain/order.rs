@@ -73,6 +73,16 @@ impl Order {
     pub fn quantity(&self) -> QuantityLots {
         self.quantity
     }
+    pub fn price(&self) -> PriceTicks {
+        self.price
+    }
+    pub fn side(&self) -> OrderSide {
+        self.side
+    }
+
+    pub fn get_order_id(&self) -> OrderId {
+        self.order_id
+    }
 }
 
 #[cfg(test)]

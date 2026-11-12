@@ -30,6 +30,10 @@ impl RestingOrder {
     pub fn is_filled(&self) -> bool {
         self.remaining_quantity().is_zero()
     }
+
+    pub fn order(&self) -> Order {
+        self.order
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]

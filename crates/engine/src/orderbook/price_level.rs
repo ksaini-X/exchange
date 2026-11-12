@@ -1,9 +1,9 @@
-use std::{collections::VecDeque, ops::Index};
+use std::collections::VecDeque;
 
 use crate::orderbook::resting_order::RestingOrder;
 
 pub struct PriceLevel {
-    orders: VecDeque<RestingOrder>,
+    pub orders: VecDeque<RestingOrder>,
 }
 
 impl PriceLevel {
@@ -13,30 +13,23 @@ impl PriceLevel {
         }
     }
 
-    pub fn add_order(&mut self, order: RestingOrder) -> Result<()> {
+    pub fn add_order(&mut self, order: RestingOrder) {
         self.orders.push_back(order);
-        Ok(())
     }
 
     pub fn front(&self) -> Option<&RestingOrder> {
-        self.orders.get(0)
+        self.orders.front()
     }
 
     pub fn front_mut(&mut self) -> Option<&mut RestingOrder> {
-        self.orders.get_mut(0)
+        self.orders.front_mut()
     }
 
-    pub fn pop_front(&mut self) -> Result<RestingOrder, PriceLevelError> {
-        self.orders.pop_front().ok_or(PriceLevelError::InvalidEntry)
+    pub fn pop_front(&mut self) -> Option<RestingOrder> {
+        self.orders.pop_front()
     }
 
-    fn is_empty(&self) -> bool {
-        self.orders.len() == 0
+    pub fn is_empty(&self) -> bool {
+        self.orders.is_empty()
     }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum PriceLevelError {
-    InvalidPriceLevel,
-    InvalidEntry,
 }

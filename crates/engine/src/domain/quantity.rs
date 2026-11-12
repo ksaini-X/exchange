@@ -29,8 +29,15 @@ impl QuantityLots {
         self.0.checked_sub(rhs.0).map(Self)
     }
 
+    pub fn checked_add(self, rhs: Self) -> Option<Self> {
+        self.0.checked_add(rhs.0).map(Self)
+    }
+
     pub fn is_zero(&self) -> bool {
         self.0 == 0
+    }
+    pub fn ZERO() -> Self {
+        Self(0)
     }
 }
 
