@@ -1,4 +1,4 @@
-use std::{error::Error, ops::Div};
+use std::ops::Div;
 
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 

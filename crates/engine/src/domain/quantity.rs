@@ -24,6 +24,14 @@ impl QuantityLots {
 
         Ok(Self(lots))
     }
+
+    pub fn checked_sub(self, rhs: Self) -> Option<Self> {
+        self.0.checked_sub(rhs.0).map(Self)
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.0 == 0
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
