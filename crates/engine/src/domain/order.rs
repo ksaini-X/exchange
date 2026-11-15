@@ -83,6 +83,12 @@ impl Order {
     pub fn get_order_id(&self) -> OrderId {
         self.order_id
     }
+    pub fn instrument_id(&self) -> InstrumentId {
+        self.instrument_id
+    }
+    pub fn time_in_force(&self) -> TimeInForce {
+        self.time_in_force
+    }
 }
 
 #[cfg(test)]

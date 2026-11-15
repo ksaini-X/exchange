@@ -1,5 +1,5 @@
 use crate::domain::{order::Order, quantity::QuantityLots};
-
+#[derive(Debug)]
 pub struct RestingOrder {
     remaining_quantity: QuantityLots,
     order: Order,
@@ -44,7 +44,7 @@ pub enum RestingOrderError {
 
 #[cfg(test)]
 mod test {
-    use std::{assert_eq, result};
+    use std::assert_eq;
 
     use rust_decimal::dec;
 

@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 use crate::orderbook::resting_order::RestingOrder;
 
+#[derive(Debug)]
 pub struct PriceLevel {
     pub orders: VecDeque<RestingOrder>,
 }
@@ -27,6 +28,10 @@ impl PriceLevel {
 
     pub fn pop_front(&mut self) -> Option<RestingOrder> {
         self.orders.pop_front()
+    }
+
+    pub fn pop_back(&mut self) -> Option<RestingOrder> {
+        self.orders.pop_back()
     }
 
     pub fn is_empty(&self) -> bool {
