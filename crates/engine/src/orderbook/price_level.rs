@@ -1,10 +1,10 @@
 use std::collections::VecDeque;
 
-use crate::orderbook::resting_order::RestingOrder;
+use crate::{domain::ids::OrderId, orderbook::resting_order::RestingOrder};
 
 #[derive(Debug)]
 pub struct PriceLevel {
-    pub orders: VecDeque<RestingOrder>,
+    orders: VecDeque<RestingOrder>,
 }
 
 impl PriceLevel {
@@ -36,5 +36,19 @@ impl PriceLevel {
 
     pub fn is_empty(&self) -> bool {
         self.orders.is_empty()
+    }
+
+    pub fn get_order(&self, order_id: OrderId) -> Option<&RestingOrder> {
+        self.orders
+            .iter()
+            .find(|order| order.order().get_order_id() == order_id)
+    }
+    pub fn remove_order(&mut self, order_id: OrderId) -> Option<RestingOrder> {
+        let index = self
+            .orders
+            .iter()
+            .position(|order| order.order().get_order_id() == order_id)?;
+
+        self.orders.remove(index)
     }
 }

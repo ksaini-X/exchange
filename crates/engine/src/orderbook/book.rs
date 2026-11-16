@@ -38,17 +38,14 @@ impl OrderBook {
     }
 
     pub fn add_order(&mut self, order: Order) -> Result<(QuantityLots, Vec<Fill>), OrderBookError> {
-        // Validate instrument.
         if order.instrument_id() != self.instrument_id {
             return Err(OrderBookError::InstrumentMismatch);
         }
 
-        // V1 supports GTC only.
         if order.time_in_force() != TimeInForce::Gtc {
             return Err(OrderBookError::UnsupportedTimeInForce);
         }
 
-        // An active order ID must be unique.
         if self.order_index.contains_key(&order.get_order_id()) {
             return Err(OrderBookError::DuplicateOrderId);
         }
@@ -59,7 +56,6 @@ impl OrderBook {
         }
     }
 
-    // Incoming BUY matches existing ASK orders.
     fn match_asks(&mut self, order: Order) -> Result<(QuantityLots, Vec<Fill>), OrderBookError> {
         let taker_order_id = order.get_order_id();
         let limit_price = order.price();
@@ -70,7 +66,6 @@ impl OrderBook {
         let mut last_execution_price = None;
 
         for (price_ticks, price_level) in self.asks.iter_mut() {
-            // Asks are ascending.
             if limit_price < *price_ticks {
                 break;
             }
@@ -92,7 +87,6 @@ impl OrderBook {
                     )
                 };
 
-                // Mutable maker borrow has ended.
                 taker.fill(fill_quantity)?;
 
                 filled_quantity = filled_quantity
@@ -123,14 +117,12 @@ impl OrderBook {
             }
         }
 
-        // Remove empty ask levels.
         self.asks.retain(|_, level| !level.is_empty());
 
         if let Some(price) = last_execution_price {
             self.last_traded_price = Some(price);
         }
 
-        // GTC remainder rests on the bid side.
         if !taker.is_filled() {
             self.insert_resting_order(taker);
         }
@@ -138,7 +130,6 @@ impl OrderBook {
         Ok((filled_quantity, fills))
     }
 
-    // Incoming SELL matches existing BID orders.
     fn match_bids(&mut self, order: Order) -> Result<(QuantityLots, Vec<Fill>), OrderBookError> {
         let taker_order_id = order.get_order_id();
         let limit_price = order.price();
@@ -148,7 +139,6 @@ impl OrderBook {
         let mut fills = Vec::new();
         let mut last_execution_price = None;
 
-        // Bids are processed from highest to lowest.
         for (price_ticks, price_level) in self.bids.iter_mut().rev() {
             if *price_ticks < limit_price {
                 break;
@@ -201,14 +191,12 @@ impl OrderBook {
             }
         }
 
-        // Remove empty bid levels.
         self.bids.retain(|_, level| !level.is_empty());
 
         if let Some(price) = last_execution_price {
             self.last_traded_price = Some(price);
         }
 
-        // GTC remainder rests on the ask side.
         if !taker.is_filled() {
             self.insert_resting_order(taker);
         }
@@ -243,8 +231,60 @@ impl OrderBook {
             .or_insert_with(PriceLevel::new)
             .add_order(resting_order);
 
-        // Index only orders that are actually resting.
         self.order_index.insert(order_id, (side, price));
+    }
+
+    pub fn get_order(&self, order_id: OrderId) -> Result<&RestingOrder, OrderBookError> {
+        let (order_side, price_ticks) = self
+            .order_index
+            .get(&order_id)
+            .ok_or(OrderBookError::OrderIndexInconsistent)?;
+
+        let levels = match *order_side {
+            OrderSide::Buy => &self.bids,
+            OrderSide::Sell => &self.asks,
+        };
+
+        let price_level = levels
+            .get(price_ticks)
+            .ok_or(OrderBookError::OrderIndexInconsistent)?;
+
+        price_level
+            .get_order(order_id)
+            .ok_or(OrderBookError::OrderIndexInconsistent)
+    }
+
+    pub fn cancel_order(&mut self, order_id: OrderId) -> Result<RestingOrder, OrderBookError> {
+        let (side, price) = self
+            .order_index
+            .get(&order_id)
+            .copied()
+            .ok_or(OrderBookError::OrderNotFound)?;
+
+        let levels = match side {
+            OrderSide::Buy => &mut self.bids,
+            OrderSide::Sell => &mut self.asks,
+        };
+
+        let (removed_order, level_is_empty) = {
+            let price_level = levels
+                .get_mut(&price)
+                .ok_or(OrderBookError::OrderIndexInconsistent)?;
+
+            let removed_order = price_level
+                .remove_order(order_id)
+                .ok_or(OrderBookError::OrderIndexInconsistent)?;
+
+            (removed_order, price_level.is_empty())
+        };
+
+        if level_is_empty {
+            levels.remove(&price);
+        }
+
+        self.order_index.remove(&order_id);
+
+        Ok(removed_order)
     }
 }
 
@@ -256,6 +296,8 @@ pub enum OrderBookError {
     EmptyPriceLevel,
     QuantityOverflow,
     RestingOrder(RestingOrderError),
+    OrderNotFound,
+    OrderIndexInconsistent,
 }
 
 impl From<RestingOrderError> for OrderBookError {
