@@ -65,7 +65,6 @@ impl Balance {
 
         let new_locked = self.locked_balance.checked_add(amount)?;
 
-        // Commit only after both calculations succeed.
         self.available_balance = new_available;
         self.locked_balance = new_locked;
 
@@ -84,10 +83,32 @@ impl Balance {
 
         let new_available = self.available_balance.checked_add(amount)?;
 
-        // Commit only after both calculations succeed.
         self.available_balance = new_available;
         self.locked_balance = new_locked;
 
+        Ok(())
+    }
+
+    pub fn deposit(&mut self, amount: AssetAmount) -> Result<(), BalanceError> {
+        if amount.is_zero() {
+            return Err(BalanceError::InvalidAmount);
+        }
+        let new_available = self.available_balance.checked_add(amount)?;
+        self.available_balance = new_available;
+
+        Ok(())
+    }
+
+    pub fn withdraw(&mut self, amount: AssetAmount) -> Result<(), BalanceError> {
+        if amount.is_zero() {
+            return Err(BalanceError::InvalidAmount);
+        }
+
+        let new_available = self
+            .available_balance
+            .checked_sub(amount)
+            .map_err(|_| BalanceError::InsufficientAvailableBalance)?;
+        self.available_balance = new_available;
         Ok(())
     }
 }

@@ -1,5 +1,5 @@
 use crate::domain::{ids::OrderId, order::OrderSide, price::PriceTicks, quantity::QuantityLots};
-
+#[derive(Debug, Clone)]
 pub struct Fill {
     maker_order_id: OrderId,
     taker_order_id: OrderId,

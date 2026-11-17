@@ -2,7 +2,7 @@ use rust_decimal::Decimal;
 
 use crate::domain::{asset::Asset, ids::InstrumentId};
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Instrument {
     instrument_id: InstrumentId,
     symbol: String,
@@ -10,6 +10,12 @@ pub struct Instrument {
     quote_asset: Asset,
     tick_size: Decimal,
     lot_size: Decimal,
+}
+
+#[derive(PartialEq, Debug)]
+pub struct GetAssets {
+    pub base_asset: Asset,
+    pub quote_asset: Asset,
 }
 
 impl Instrument {
@@ -51,6 +57,12 @@ impl Instrument {
 
     pub fn lot_size(&self) -> Decimal {
         self.lot_size
+    }
+    pub fn get_assets(&self) -> GetAssets {
+        GetAssets {
+            base_asset: self.base_asset,
+            quote_asset: self.quote_asset,
+        }
     }
 }
 

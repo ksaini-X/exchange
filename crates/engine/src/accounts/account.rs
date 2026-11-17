@@ -5,12 +5,14 @@ use crate::{
     domain::{asset::Asset, ids::AccountId},
 };
 
+#[derive(Debug, Clone)]
 pub struct Account {
     account_id: AccountId,
     assets: HashMap<Asset, Balance>,
 }
 impl Account {
-    pub fn new(account_id: AccountId, supported_assets: impl IntoIterator<Item = Asset>) -> Self {
+    pub fn new(supported_assets: impl IntoIterator<Item = Asset>) -> Self {
+        let account_id = AccountId::new();
         let assets = supported_assets
             .into_iter()
             .map(|asset| (asset, Balance::new()))
@@ -45,6 +47,29 @@ impl Account {
             .ok_or(AccountError::AssetNotFound)?;
 
         balance.unlock(amount)?;
+
+        Ok(())
+    }
+    pub fn withdraw_asset(
+        &mut self,
+        asset: Asset,
+        amount: AssetAmount,
+    ) -> Result<(), AccountError> {
+        let asset_balance = self
+            .assets
+            .get_mut(&asset)
+            .ok_or(AccountError::AssetNotFound)?;
+        asset_balance.withdraw(amount)?;
+
+        Ok(())
+    }
+
+    pub fn deposit_asset(&mut self, asset: Asset, amount: AssetAmount) -> Result<(), AccountError> {
+        let asset_balance = self
+            .assets
+            .get_mut(&asset)
+            .ok_or(AccountError::AssetNotFound)?;
+        asset_balance.deposit(amount)?;
 
         Ok(())
     }

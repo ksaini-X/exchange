@@ -20,9 +20,9 @@ pub enum OrderSide {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Order {
+    order_id: OrderId,
     instrument_id: InstrumentId,
     account_id: AccountId,
-    order_id: OrderId,
     side: OrderSide,
     price: PriceTicks,
     quantity: QuantityLots,
