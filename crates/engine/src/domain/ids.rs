@@ -29,3 +29,11 @@ impl TradeId {
         Self(Uuid::new_v4())
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct CommandId(Uuid);
+impl CommandId {
+    pub fn new() -> Self {
+        Self(Uuid::new_v4())
+    }
+}
