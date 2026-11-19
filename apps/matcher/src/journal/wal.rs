@@ -1,7 +1,6 @@
-use std::io::{Read, Seek, SeekFrom, Write};
+use std::io::{Read, Seek, SeekFrom};
 use std::{
     fs::{File, OpenOptions},
-    io::{Read, Write},
     path::Path,
 };
 
@@ -55,4 +54,10 @@ impl Wal {
 
         Ok(logs)
     }
+}
+
+pub enum WalError {
+    Io(std::io::Error),
+    Deserialization(serde_json::error::Error),
+    Serialization(serde_json::error::Error),
 }

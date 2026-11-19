@@ -1,7 +1,9 @@
 use core::fmt;
 use std::{alloc::System, write};
 
-#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Asset {
     Usdc,
     Eth,

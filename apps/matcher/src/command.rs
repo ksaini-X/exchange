@@ -4,8 +4,8 @@ use engine::domain::{
     order::{OrderSide, TimeInForce},
 };
 use rust_decimal::Decimal;
-use serde::Serialize;
-#[derive(Serialize)]
+use serde::{Deserialize, Serialize};
+#[derive(Serialize, Deserialize)]
 pub enum Command {
     CreateAccount,
     RegisterInstrument {
