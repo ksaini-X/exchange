@@ -1,7 +1,9 @@
 use crate::{command::Command, sequencer::SequenceNumber};
 use engine::domain::ids::CommandId;
+use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
 
+#[derive(Serialize, Deserialize)]
 pub struct CommandEnvelope {
     pub command_id: CommandId,
     pub sequence: SequenceNumber,
